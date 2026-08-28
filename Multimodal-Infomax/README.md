@@ -1,39 +1,45 @@
-# MultiModal-InfoMax
+# Enhanced MMIM for Multimodal Sentiment Analysis
 
-This repository contains the official implementation code of the paper [Improving Multimodal Fusion with Hierarchical Mutual Information Maximization for Multimodal Sentiment Analysis](https://arxiv.org/pdf/2109.00412.pdf), accepted at **EMNLP 2021**.
+An enhanced implementation of **Multimodal Mutual Information Maximization (MMIM)** for multimodal sentiment analysis using **text, audio, and visual modalities**.
 
-:fire:  If you would be interested in other multimodal works in our DeCLaRe Lab, welcome to visit the [clustered repository](https://github.com/declare-lab/multimodal-deep-learning)
+## Overview
 
-## Introduction
-Multimodal-informax (MMIM) synthesizes fusion results from multi-modality input through a two-level mutual information (MI) maximization. We use BA (Barber-Agakov) lower bound and contrastive predictive coding as the target function to be maximized. To facilitate the computation, we design an entropy estimation module with associated history data memory to facilitate the computation of BA lower bound and the training process.
+This project extends the original MMIM architecture with improved multimodal interaction, adaptive fusion, and robustness mechanisms.
 
-![Alt text](img/ModelFigSingle.png?raw=true "Model")
+### Key Improvements
 
-## Usage
-1. Download the CMU-MOSI and CMU-MOSEI dataset from [Google Drive](https://drive.google.com/drive/folders/1djN_EkrwoRLUt7Vq_QfNZgCl_24wBiIK?usp=sharing) or [Baidu Disk](https://pan.baidu.com/s/1Wxo4Bim9JhNmg8265p3ttQ) (extraction code: g3m2). Place them under the folder `Multimodal-Infomax/datasets`
+- **GCN Fusion:** Treats text, audio, and visual embeddings as graph nodes and learns cross-modal interactions through message passing with residual connections.
+- **Adaptive Gated Fusion:** Dynamically learns the importance of each modality and the graph representation during fusion.
+- **Modality Dropout:** Randomly drops modalities during training to improve robustness to missing or noisy inputs.
+- **Layer Normalization & Dropout:** Improves training stability and generalization.
+- **Token Attention Pooling:** Learns to assign higher importance to informative textual tokens.
 
-2. Set up the environment (need conda prerequisite)
-```
-conda env create -f environment.yml
-conda activate MMIM
-```
+## Architecture
 
-3. Start training
-```
-python main.py --dataset mosi --contrast
-```
-
-## Citation
-Please cite our paper if you find our work useful for your research:
-```bibtex
-@inproceedings{han2021improving,
-  title={Improving Multimodal Fusion with Hierarchical Mutual Information Maximization for Multimodal Sentiment Analysis},
-  author={Han, Wei and Chen, Hui and Poria, Soujanya},
-  booktitle={Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing},
-  pages={9180--9192},
-  year={2021}
-}
-```
-
-## Contact 
-Should you have any question, feel free to contact me through [henryhan88888@gmail.com](henryhan88888@gmail.com)
+```text
+Text ──→ Text Encoder ──→ Token Pooling ──┐
+                                          │
+Audio ─→ RNN Encoder ─────────────────────┤
+                                          ├──→ Projection
+Video ─→ RNN Encoder ─────────────────────┘
+                                               │
+                                               ↓
+                                        Modality Dropout
+                                               │
+                                               ↓
+                                          GCN Fusion
+                                               │
+                                               ↓
+                                    Graph Embedding (g)
+                                               │
+                                               ↓
+                                    Adaptive Gated Fusion
+                                               │
+                                               ↓
+                                         Hybrid Fusion
+                                               │
+                                               ↓
+                                      LayerNorm + Dropout
+                                               │
+                                               ↓
+                                          Classifier
